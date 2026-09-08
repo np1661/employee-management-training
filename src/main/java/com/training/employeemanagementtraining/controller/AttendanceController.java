@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -23,6 +24,7 @@ public class AttendanceController {
 
     // POST /api/attendance
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AttendanceResponse> markAttendance(
             @RequestBody AttendanceRequest request) {
 
@@ -36,6 +38,7 @@ public class AttendanceController {
 
     // GET /api/attendance
     @GetMapping
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<List<AttendanceResponse>> getAllAttendance() {
 
         return ResponseEntity.ok(
@@ -45,6 +48,7 @@ public class AttendanceController {
 
     // GET /api/attendance/{id}
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<AttendanceResponse> getAttendanceById(
             @PathVariable Long id) {
 
@@ -55,6 +59,7 @@ public class AttendanceController {
 
     // PUT /api/attendance/{id}
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AttendanceResponse> updateAttendance(
             @PathVariable Long id,
             @RequestBody AttendanceRequest request) {
@@ -66,6 +71,7 @@ public class AttendanceController {
 
     // DELETE /api/attendance/{id}
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public String deleteAttendance(
             @PathVariable Long id) {
 
@@ -74,6 +80,7 @@ public class AttendanceController {
 
     // GET /api/attendance/employee/{employeeId}
     @GetMapping("/employee/{employeeId}")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<List<AttendanceResponse>>
     getAttendanceByEmployee(
             @PathVariable Long employeeId) {
@@ -86,6 +93,7 @@ public class AttendanceController {
 
     // GET /api/attendance/date/{date}
     @GetMapping("/date/{date}")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<List<AttendanceResponse>>
     getAttendanceByDate(
             @PathVariable LocalDate date) {
