@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,6 +18,7 @@ public class DepartmentController {
     private final DepartmentService departmentService;
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<DepartmentDTO> createDepartment(
             @Valid @RequestBody DepartmentDTO departmentDTO) {
 
@@ -27,6 +29,7 @@ public class DepartmentController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<List<DepartmentDTO>> getAllDepartments() {
 
         return ResponseEntity.ok(
@@ -35,6 +38,7 @@ public class DepartmentController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<DepartmentDTO> getDepartmentById(
             @PathVariable Long id) {
 
@@ -44,6 +48,7 @@ public class DepartmentController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<DepartmentDTO> updateDepartment(
             @PathVariable Long id,
             @Valid @RequestBody DepartmentDTO departmentDTO) {
@@ -54,6 +59,7 @@ public class DepartmentController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteDepartment(
             @PathVariable Long id) {
 
@@ -63,6 +69,7 @@ public class DepartmentController {
     }
 
     @GetMapping("/search")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<List<DepartmentDTO>> searchDepartments(
             @RequestParam String departmentName) {
 
