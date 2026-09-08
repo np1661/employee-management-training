@@ -10,4 +10,6 @@ import java.util.List;
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
     List<Employee> findByNameContainingIgnoreCase(String name);
+
+    long countByDepartment_Id(Long departmentId);
 }

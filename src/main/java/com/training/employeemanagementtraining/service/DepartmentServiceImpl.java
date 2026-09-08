@@ -3,6 +3,7 @@ package com.training.employeemanagementtraining.service;
 import com.training.employeemanagementtraining.dto.DepartmentDTO;
 import com.training.employeemanagementtraining.entity.Department;
 import com.training.employeemanagementtraining.repository.DepartmentRepository;
+import com.training.employeemanagementtraining.repository.EmployeeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DepartmentServiceImpl implements DepartmentService{
     private final DepartmentRepository departmentRepository;
+    private final EmployeeRepository employeeRepository;
 
     @Override
     public DepartmentDTO createDepartment(DepartmentDTO departmentDTO) {
@@ -64,6 +66,11 @@ public class DepartmentServiceImpl implements DepartmentService{
 
         Department department=departmentRepository.findById(id)
                 .orElseThrow(()->new RuntimeException("department not found"));
+        long employeeCount = employeeRepository.countByDepartment_Id(id);
+        if (employeeCount > 0) {
+            throw new RuntimeException("Cannot delete department because it has "
+                    + employeeCount + " employee(s) assigned to it");
+        }
         departmentRepository.delete(department);
     }
 
