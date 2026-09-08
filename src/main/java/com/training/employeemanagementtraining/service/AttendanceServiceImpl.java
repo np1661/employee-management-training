@@ -5,7 +5,9 @@ package com.training.employeemanagementtraining.service;
 import com.training.employeemanagementtraining.dto.AttendanceRequest;
 import com.training.employeemanagementtraining.dto.AttendanceResponse;
 import com.training.employeemanagementtraining.entity.Attendance;
+import com.training.employeemanagementtraining.entity.Employee;
 import com.training.employeemanagementtraining.repository.AttendanceRepository;
+import com.training.employeemanagementtraining.repository.EmployeeRepository;
 import com.training.employeemanagementtraining.service.AttendanceService;
 
 import lombok.RequiredArgsConstructor;
@@ -20,13 +22,15 @@ import java.util.List;
 public class AttendanceServiceImpl implements AttendanceService {
 
     private final AttendanceRepository attendanceRepository;
+    private final EmployeeRepository employeeRepository;
 
     @Override
     public AttendanceResponse markAttendance(
             AttendanceRequest request) {
+        Employee employee = findEmployee(request.getEmployeeId());
 
         Attendance attendance = Attendance.builder()
-                .employeeId(request.getEmployeeId())
+                .employee(employee)
                 .date(request.getDate())
                 .status(request.getStatus())
                 .checkInTime(request.getCheckInTime())
@@ -71,8 +75,9 @@ public class AttendanceServiceImpl implements AttendanceService {
                         new RuntimeException(
                                 "Attendance not found with id: " + id
                         ));
+        Employee employee = findEmployee(request.getEmployeeId());
 
-        attendance.setEmployeeId(request.getEmployeeId());
+        attendance.setEmployee(employee);
         attendance.setDate(request.getDate());
         attendance.setStatus(request.getStatus());
         attendance.setCheckInTime(request.getCheckInTime());
@@ -101,9 +106,9 @@ public class AttendanceServiceImpl implements AttendanceService {
     @Override
     public List<AttendanceResponse> getAttendanceByEmployee(
             Long employeeId) {
-
+        findEmployee(employeeId);
         return attendanceRepository
-                .findByEmployeeId(employeeId)
+                .findByEmployee_Id(employeeId)
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
@@ -119,13 +124,26 @@ public class AttendanceServiceImpl implements AttendanceService {
                 .map(this::mapToResponse)
                 .toList();
     }
+    private Employee findEmployee(Long employeeId) {
+        return employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new RuntimeException(
+                        "Employee not found with id: " + employeeId));
+    }
+
+    private Attendance findAttendance(Long id) {
+        return attendanceRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException(
+                        "Attendance not found with id: " + id));
+    }
 
     private AttendanceResponse mapToResponse(
             Attendance attendance) {
+        Employee employee = attendance.getEmployee();
 
         return AttendanceResponse.builder()
-                .id(attendance.getId())
-                .employeeId(attendance.getEmployeeId())
+                .employeeId(employee.getId())
+                .employeeName(employee.getName())
+                .departmentName(employee.getDepartment().getDepartmentName())
                 .date(attendance.getDate())
                 .status(attendance.getStatus())
                 .checkInTime(attendance.getCheckInTime())

@@ -13,9 +13,11 @@ import java.time.LocalTime;
 @Builder
 public class AttendanceResponse {
 
-    private Long id;
-
     private Long employeeId;
+
+    private String employeeName;
+
+    private String departmentName;
 
     private LocalDate date;
 

@@ -3,6 +3,7 @@ package com.training.employeemanagementtraining.service;
 import com.training.employeemanagementtraining.dto.EmployeeRequest;
 import com.training.employeemanagementtraining.dto.EmployeeResponse;
 import com.training.employeemanagementtraining.entity.Employee;
+import com.training.employeemanagementtraining.repository.DepartmentRepository;
 import com.training.employeemanagementtraining.repository.EmployeeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,15 +15,19 @@ import java.util.List;
 public class EmployeeService {
 
     private final EmployeeRepository employeeRepository;
+    private final DepartmentRepository departmentRepository;
 
     public String createEmployee(EmployeeRequest request) {
 
+        var department = departmentRepository.findById(request.getDepartmentId())
+                .orElseThrow(() -> new RuntimeException(
+                        "Department not found with id " + request.getDepartmentId()));
         Employee employee = new Employee();
 
         employee.setName(request.getName());
         employee.setEmail(request.getEmail());
         employee.setAddress(request.getAddress());
-        employee.setDepartment(request.getDepartment());
+        employee.setDepartment(department);
         employeeRepository.save(employee);
         return "Employee created successfully";
     }
@@ -46,11 +51,14 @@ public class EmployeeService {
 
         Employee employee = employeeRepository.findById(id).orElseThrow(() ->
                 new RuntimeException("Employee not found with id " + id));
+        var department = departmentRepository.findById(update.getDepartmentId())
+                .orElseThrow(() -> new RuntimeException(
+                        "Department not found with id " + update.getDepartmentId()));
 
         employee.setName(update.getName());
         employee.setEmail(update.getEmail());
         employee.setAddress(update.getAddress());
-        employee.setDepartment(update.getDepartment());
+        employee.setDepartment(department);
         employeeRepository.save(employee);
         return "Employee updated successfully";
     }
@@ -79,7 +87,7 @@ public class EmployeeService {
                 employee.getName(),
                 employee.getEmail(),
                 employee.getAddress(),
-                employee.getDepartment()
+                employee.getDepartment().getDepartmentName()
         );
     }
 
